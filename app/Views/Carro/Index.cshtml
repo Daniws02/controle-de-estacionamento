@@ -1,0 +1,166 @@
+@model IEnumerable<app.Models.Carro>
+
+@{
+  ViewData["Title"] = "Estacionamento";
+}
+
+<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+  <div>
+    <h1>Estacionamento</h1>
+  </div>
+  <div>
+    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#confirmLimparHistoricoModal">
+      Limpar Histórico
+    </button>
+  </div>
+</div>
+
+<div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+  <button type="button" class="btn btn-success" data-toggle="modal" data-target="#entradaModal">Marcar Entrada</button>
+  <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#saidaModal"
+    style="margin-left: 10px;">Marcar Saída</button>
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>
+        Placa
+      </th>
+      <th>
+        Data de Entrada
+      </th>
+      <th>
+        Data de Saída
+      </th>
+      <th>
+        Duração
+      </th>
+      <th>
+        Preço
+      </th>
+      <th>
+        Estacionado
+      </th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (var carro in Model.OrderByDescending(i => i.Id))
+    {
+      <tr>
+        <td>
+          @Html.DisplayFor(modelItem => carro.Placa)
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => carro.DataEntrada)
+        </td>
+        <td>
+          @{
+            if (carro.DataSaida == DateTime.MinValue)
+            {
+              <text>Data não informada</text>;
+            }
+            else
+            {
+              @Html.DisplayFor(modelItem => carro.DataSaida)
+            }
+          }
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => carro.Duracao)
+        </td>
+        <td>
+          R$ @Html.DisplayFor(modelItem => carro.Preco),00
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => carro.Estacionado)
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+
+
+<div class="modal fade" id="entradaModal" tabindex="-1" role="dialog" aria-labelledby="entradaModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="entradaModalLabel">Marcar Entrada</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form asp-action="CreateEntrada">
+          <div class="form-group">
+            <label for="Placa" style="margin-bottom: 10px;">Placa</label>
+            <input type="text" style="margin-bottom: 10px;" class="form-control" id="Placa" name="Placa" required>
+          </div>
+          <button type="submit" class="btn btn-success">Salvar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<div class="modal fade" id="saidaModal" tabindex="-1" role="dialog" aria-labelledby="saidaModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="saidaModalLabel">Marcar Saída</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form asp-action="CreateSaida">
+          <div class="form-group">
+            <label for="PlacaSaida" style="margin-bottom: 10px;">Placa</label>
+            <select class="form-control" style="margin-bottom: 10px;" id="PlacaSaida" name="Placa" required>
+              @foreach (var carro in Model.Where(i => i.Estacionado))
+              {
+                <option value="@carro.Placa">@carro.Placa</option>
+              }
+            </select>
+          </div>
+          <button type="submit" class="btn btn-success">Salvar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<div class="modal fade" id="confirmLimparHistoricoModal" tabindex="-1" role="dialog" aria-labelledby="confirmLimparHistoricoModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmLimparHistoricoModalLabel">Confirmar Limpeza de Histórico</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Deseja limpar todo o histórico?</p>
+      </div>
+      <div class="modal-footer">
+        <form asp-action="LimparHistorico" method="post">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">Confirmar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
